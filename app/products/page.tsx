@@ -30,6 +30,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { DeleteProductModal } from "@/components/delete-product-modal";
 import {
   Select,
   SelectContent,
@@ -50,6 +51,12 @@ export default function ProductsPage() {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -148,18 +155,26 @@ export default function ProductsPage() {
     priceRange.min !== "" ||
     priceRange.max !== "";
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this product?")) {
-      return;
-    }
+  const handleDeleteClick = (id: number, name: string) => {
+    setProductToDelete({ id, name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
 
     try {
-      await deleteProduct(id);
+      setIsDeleting(true);
+      await deleteProduct(productToDelete.id);
       // Refresh the product list after deletion
       await fetchProducts();
+      setIsDeleteModalOpen(false);
+      setProductToDelete(null);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete product");
       console.error("Error deleting product:", err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -436,7 +451,7 @@ export default function ProductsPage() {
                               size="icon"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDelete(product.id);
+                                handleDeleteClick(product.id, product.title);
                               }}
                             >
                               <Trash2 className="size-4" />
@@ -574,6 +589,14 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+
+      <DeleteProductModal
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={handleDeleteConfirm}
+        productName={productToDelete?.name}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
