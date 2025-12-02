@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+import { createProduct } from "@/lib/api/products"
 
 export default function AddProductPage() {
   const router = useRouter()
@@ -13,35 +14,33 @@ export default function AddProductPage() {
     name: "",
     description: "",
     price: "",
-    stock: "",
+    category: "",
+    image: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
-    // Get existing products from localStorage
-    const storedProducts = localStorage.getItem("products")
-    const products = storedProducts ? JSON.parse(storedProducts) : []
-
-    // Create new product
-    const newProduct = {
-      id: Date.now().toString(),
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
+    try {
+      await createProduct({
+        title: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        image: formData.image || "https://via.placeholder.com/300",
+      })
+      // Reset submitting state before redirect
+      setIsSubmitting(false)
+      // Redirect to products list on success
+      router.push("/products")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create product")
+      setIsSubmitting(false)
     }
-
-    // Add to products array
-    products.push(newProduct)
-
-    // Save back to localStorage
-    localStorage.setItem("products", JSON.stringify(products))
-
-    // Redirect to products list
-    router.push("/products")
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -61,6 +60,13 @@ export default function AddProductPage() {
         </Button>
         <h1 className="text-3xl font-bold">Add Product</h1>
       </div>
+
+      {error && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 max-w-2xl">
+          <p className="text-destructive font-medium">Error</p>
+          <p className="text-sm text-muted-foreground mt-1">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
         <div className="space-y-2">
@@ -112,20 +118,36 @@ export default function AddProductPage() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="stock" className="text-sm font-medium">
-              Stock
+            <label htmlFor="category" className="text-sm font-medium">
+              Category
             </label>
             <Input
-              id="stock"
-              name="stock"
-              type="number"
+              id="category"
+              name="category"
+              type="text"
               required
-              value={formData.stock}
+              value={formData.category}
               onChange={handleChange}
-              placeholder="0"
-              min="0"
+              placeholder="e.g., electronics, clothing"
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="image" className="text-sm font-medium">
+            Image URL
+          </label>
+          <Input
+            id="image"
+            name="image"
+            type="url"
+            value={formData.image}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+          />
+          <p className="text-xs text-muted-foreground">
+            Leave empty to use a placeholder image
+          </p>
         </div>
 
         <div className="flex gap-4">

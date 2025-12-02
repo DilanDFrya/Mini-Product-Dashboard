@@ -4,86 +4,81 @@ import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  stock: number
-}
+import { getProduct, updateProduct } from "@/lib/api/products"
 
 export default function EditProductPage() {
   const router = useRouter()
   const params = useParams()
-  const productId = params.id as string
+  const productId = parseInt(params.id as string)
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
-    stock: "",
+    category: "",
+    image: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Load product from localStorage
-    const storedProducts = localStorage.getItem("products")
-    if (storedProducts) {
-      const products: Product[] = JSON.parse(storedProducts)
-      const product = products.find((p) => p.id === productId)
+    if (isNaN(productId)) {
+      router.push("/products")
+      return
+    }
 
-      if (product) {
+    const fetchProduct = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        const product = await getProduct(productId)
         setFormData({
-          name: product.name,
+          name: product.title,
           description: product.description,
           price: product.price.toString(),
-          stock: product.stock.toString(),
+          category: product.category,
+          image: product.image,
         })
-      } else {
-        // Product not found, redirect to products list
-        router.push("/products")
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load product")
+        console.error("Error fetching product:", err)
+        // Redirect to products list if product not found
+        if (err instanceof Error && err.message === "Product not found") {
+          setTimeout(() => router.push("/products"), 2000)
+        }
+      } finally {
+        setIsLoading(false)
       }
     }
-    setIsLoading(false)
+
+    fetchProduct()
   }, [productId, router])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
-    // Get existing products from localStorage
-    const storedProducts = localStorage.getItem("products")
-    if (!storedProducts) {
+    try {
+      await updateProduct(productId, {
+        title: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        image: formData.image || "https://via.placeholder.com/300",
+      })
+      // Reset submitting state before redirect
+      setIsSubmitting(false)
+      // Redirect to products list on success
       router.push("/products")
-      return
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update product")
+      setIsSubmitting(false)
     }
-
-    const products: Product[] = JSON.parse(storedProducts)
-    const productIndex = products.findIndex((p) => p.id === productId)
-
-    if (productIndex === -1) {
-      router.push("/products")
-      return
-    }
-
-    // Update product
-    products[productIndex] = {
-      id: productId,
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-    }
-
-    // Save back to localStorage
-    localStorage.setItem("products", JSON.stringify(products))
-
-    // Redirect to products list
-    router.push("/products")
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -104,7 +99,47 @@ export default function EditProductPage() {
           </Button>
           <h1 className="text-3xl font-bold">Edit Product</h1>
         </div>
-        <p>Loading...</p>
+        <div className="space-y-4 max-w-2xl">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error && error === "Product not found") {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/products">
+              <ArrowLeft className="size-4" />
+            </Link>
+          </Button>
+          <h1 className="text-3xl font-bold">Edit Product</h1>
+        </div>
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 max-w-2xl">
+          <p className="text-destructive font-medium">Product not found</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Redirecting to products list...
+          </p>
+        </div>
       </div>
     )
   }
@@ -119,6 +154,13 @@ export default function EditProductPage() {
         </Button>
         <h1 className="text-3xl font-bold">Edit Product</h1>
       </div>
+
+      {error && error !== "Product not found" && (
+        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 max-w-2xl">
+          <p className="text-destructive font-medium">Error</p>
+          <p className="text-sm text-muted-foreground mt-1">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
         <div className="space-y-2">
@@ -170,20 +212,36 @@ export default function EditProductPage() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="stock" className="text-sm font-medium">
-              Stock
+            <label htmlFor="category" className="text-sm font-medium">
+              Category
             </label>
             <Input
-              id="stock"
-              name="stock"
-              type="number"
+              id="category"
+              name="category"
+              type="text"
               required
-              value={formData.stock}
+              value={formData.category}
               onChange={handleChange}
-              placeholder="0"
-              min="0"
+              placeholder="e.g., electronics, clothing"
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="image" className="text-sm font-medium">
+            Image URL
+          </label>
+          <Input
+            id="image"
+            name="image"
+            type="url"
+            value={formData.image}
+            onChange={handleChange}
+            placeholder="https://example.com/image.jpg"
+          />
+          <p className="text-xs text-muted-foreground">
+            Leave empty to use a placeholder image
+          </p>
         </div>
 
         <div className="flex gap-4">

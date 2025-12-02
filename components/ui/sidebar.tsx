@@ -164,6 +164,11 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const [isMounted, setIsMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   if (collapsible === "none") {
     return (
@@ -180,7 +185,9 @@ function Sidebar({
     )
   }
 
-  if (isMobile) {
+  // During SSR and before hydration, always render desktop version to prevent mismatch
+  // After hydration, use the actual isMobile value
+  if (isMounted && isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
