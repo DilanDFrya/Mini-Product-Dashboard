@@ -21,9 +21,15 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Star,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getProducts, deleteProduct, type Product } from "@/lib/api/products";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import {
   Select,
   SelectContent,
@@ -387,51 +393,91 @@ export default function ProductsPage() {
               </TableHeader>
               <TableBody>
                 {paginatedProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <img
-                        src={product.image}
-                        alt={product.title}
-                        className="h-16 w-16 rounded object-cover"
-                        onError={(e) => {
-                          // Fallback to placeholder if image fails to load
-                          const target = e.target as HTMLImageElement;
-                          target.src =
-                            "https://via.placeholder.com/64?text=No+Image";
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {product.title}
-                    </TableCell>
-                    <TableCell className="max-w-md truncate">
-                      {product.description}
-                    </TableCell>
-                    <TableCell>${product.price.toFixed(2)}</TableCell>
-                    <TableCell className="capitalize">
-                      {product.category}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-start gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() =>
-                            router.push(`/products/edit/${product.id}`)
-                          }
-                        >
-                          <Edit className="size-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          onClick={() => handleDelete(product.id)}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
+                  <HoverCard key={product.id}>
+                    <HoverCardTrigger asChild>
+                      <TableRow className="cursor-pointer">
+                        <TableCell>
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="h-16 w-16 rounded object-cover"
+                            onError={(e) => {
+                              // Fallback to placeholder if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.src =
+                                "https://via.placeholder.com/64?text=No+Image";
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {product.title}
+                        </TableCell>
+                        <TableCell className="max-w-md truncate">
+                          {product.description}
+                        </TableCell>
+                        <TableCell>${product.price.toFixed(2)}</TableCell>
+                        <TableCell className="capitalize">
+                          {product.category}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-start gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/products/edit/${product.id}`);
+                              }}
+                            >
+                              <Edit className="size-4" />
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(product.id);
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      className="w-80"
+                      align="start"
+                      side="bottom"
+                    >
+                      <div className="space-y-3">
+                        <div>
+                          <h4 className="text-sm font-semibold mb-1">
+                            {product.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground">
+                            {product.description}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4 pt-2 border-t">
+                          <div className="flex items-center gap-1.5">
+                            <Star className="size-4 fill-primary text-primary" />
+                            <span className="text-sm font-medium">
+                              {product.rating.rate}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              ({product.rating.count} reviews)
+                            </span>
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
               </TableBody>
             </Table>
