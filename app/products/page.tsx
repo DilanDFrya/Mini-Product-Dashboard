@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -412,16 +413,13 @@ export default function ProductsPage() {
                     <HoverCardTrigger asChild>
                       <TableRow className="cursor-pointer">
                         <TableCell>
-                          <img
+                          <Image
                             src={product.image}
                             alt={product.title}
+                            width={64}
+                            height={64}
                             className="h-16 w-16 rounded object-cover"
-                            onError={(e) => {
-                              // Fallback to placeholder if image fails to load
-                              const target = e.target as HTMLImageElement;
-                              target.src =
-                                "https://via.placeholder.com/64?text=No+Image";
-                            }}
+                            unoptimized
                           />
                         </TableCell>
                         <TableCell className="font-medium">
@@ -434,7 +432,7 @@ export default function ProductsPage() {
                         <TableCell className="capitalize">
                           {product.category}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-left">
                           <div className="flex justify-start gap-2">
                             <Button
                               variant="outline"
