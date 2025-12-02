@@ -68,7 +68,7 @@ export default function AddProductPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-sm">
         <div className="space-y-2">
           <label htmlFor="name" className="text-sm font-medium">
             Product Name

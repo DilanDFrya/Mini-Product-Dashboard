@@ -1,0 +1,105 @@
+/* 
+  COLOR THEME OPTIONS
+  Copy the theme you want into app/globals.css :root section
+*/
+
+/* ============================================
+   OPTION 1: MODERN BLUE (Professional)
+   ============================================ */
+:root.blue-theme {
+  --background: oklch(0.99 0.002 240);
+  --foreground: oklch(0.15 0.01 240);
+  --primary: oklch(0.5 0.18 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.25 0.02 240);
+  --muted: oklch(0.96 0.008 240);
+  --muted-foreground: oklch(0.5 0.015 240);
+  --accent: oklch(0.6 0.16 240);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.01 240);
+  --input: oklch(0.94 0.008 240);
+  --ring: oklch(0.5 0.18 240);
+  --sidebar: oklch(0.98 0.005 240);
+  --sidebar-foreground: oklch(0.2 0.015 240);
+  --sidebar-primary: oklch(0.5 0.18 240);
+  --sidebar-accent: oklch(0.94 0.01 240);
+  --sidebar-border: oklch(0.88 0.01 240);
+  --sidebar-ring: oklch(0.5 0.18 240);
+}
+
+/* ============================================
+   OPTION 2: EMERALD GREEN (Fresh & Modern)
+   ============================================ */
+:root.green-theme {
+  --background: oklch(0.99 0.002 160);
+  --foreground: oklch(0.15 0.01 160);
+  --primary: oklch(0.5 0.2 160);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.01 160);
+  --secondary-foreground: oklch(0.25 0.02 160);
+  --muted: oklch(0.96 0.008 160);
+  --muted-foreground: oklch(0.5 0.015 160);
+  --accent: oklch(0.6 0.18 160);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.01 160);
+  --input: oklch(0.94 0.008 160);
+  --ring: oklch(0.5 0.2 160);
+  --sidebar: oklch(0.98 0.005 160);
+  --sidebar-foreground: oklch(0.2 0.015 160);
+  --sidebar-primary: oklch(0.5 0.2 160);
+  --sidebar-accent: oklch(0.94 0.01 160);
+  --sidebar-border: oklch(0.88 0.01 160);
+  --sidebar-ring: oklch(0.5 0.2 160);
+}
+
+/* ============================================
+   OPTION 3: PURPLE/VIOLET (Creative) - CURRENT
+   ============================================ */
+:root.purple-theme {
+  --background: oklch(0.99 0.002 285);
+  --foreground: oklch(0.15 0.01 285);
+  --primary: oklch(0.55 0.22 285);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.01 285);
+  --secondary-foreground: oklch(0.25 0.02 285);
+  --muted: oklch(0.96 0.008 285);
+  --muted-foreground: oklch(0.5 0.015 285);
+  --accent: oklch(0.65 0.18 285);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.01 285);
+  --input: oklch(0.94 0.008 285);
+  --ring: oklch(0.55 0.22 285);
+  --sidebar: oklch(0.98 0.005 285);
+  --sidebar-foreground: oklch(0.2 0.015 285);
+  --sidebar-primary: oklch(0.55 0.22 285);
+  --sidebar-accent: oklch(0.94 0.01 285);
+  --sidebar-border: oklch(0.88 0.01 285);
+  --sidebar-ring: oklch(0.55 0.22 285);
+}
+
+/* ============================================
+   OPTION 4: SLATE/INDIGO (Sophisticated)
+   ============================================ */
+:root.indigo-theme {
+  --background: oklch(0.99 0.002 260);
+  --foreground: oklch(0.15 0.01 260);
+  --primary: oklch(0.45 0.15 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.96 0.01 260);
+  --secondary-foreground: oklch(0.25 0.02 260);
+  --muted: oklch(0.96 0.008 260);
+  --muted-foreground: oklch(0.5 0.015 260);
+  --accent: oklch(0.55 0.14 260);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.01 260);
+  --input: oklch(0.94 0.008 260);
+  --ring: oklch(0.45 0.15 260);
+  --sidebar: oklch(0.97 0.003 260);
+  --sidebar-foreground: oklch(0.2 0.015 260);
+  --sidebar-primary: oklch(0.45 0.15 260);
+  --sidebar-accent: oklch(0.94 0.01 260);
+  --sidebar-border: oklch(0.88 0.01 260);
+  --sidebar-ring: oklch(0.45 0.15 260);
+}
+

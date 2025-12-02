@@ -250,20 +250,20 @@ export default function ProductsPage() {
       <div className="space-y-4">
         {/* Search Bar - Prominent */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-primary/60" />
           <Input
             type="text"
             placeholder="Search products by name or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 pl-10 text-base"
+            className="h-11 pl-10 text-base border-primary/20 focus-visible:border-primary/40 focus-visible:ring-primary/20"
           />
         </div>
 
         {/* Filters Section */}
-        <div className="rounded-lg border bg-muted/30 p-4">
+        <div className="rounded-lg border border-border bg-gradient-to-br from-muted/60 via-muted/40 to-muted/30 p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Filters</h3>
+            <h3 className="text-sm font-semibold text-foreground">Filters</h3>
             {hasActiveFilters && (
               <Button
                 variant="ghost"
@@ -373,7 +373,7 @@ export default function ProductsPage() {
       ) : (
         <div className="space-y-4">
           {/* Products Table */}
-          <div className="rounded-md border">
+          <div className="rounded-lg border border-border bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -438,7 +438,7 @@ export default function ProductsPage() {
           </div>
 
           {/* Pagination - Separate from table */}
-          <div className="flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
