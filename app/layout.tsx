@@ -7,6 +7,7 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -44,28 +45,40 @@ export default function RootLayout({
       >
         <SidebarProvider>
           <Sidebar>
-            <SidebarHeader>
-              <div className="flex items-center gap-2 px-2 py-2">
-                <Package className="size-6" />
-                <span className="font-semibold text-lg">Product Dashboard</span>
+            <SidebarHeader className="h-16 border-b">
+              <div className="flex h-full items-center gap-2 px-3">
+                <div className="flex size-8 items-center justify-center rounded-full border-2">
+                  <Package className="size-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm leading-tight">
+                    Product
+                  </span>
+                  <span className="font-bold text-sm leading-tight">
+                    Dashboard
+                  </span>
+                </div>
               </div>
             </SidebarHeader>
             <SidebarContent>
               <SidebarGroup>
+                <SidebarGroupLabel className="px-3 text-xs">
+                  Products
+                </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild size="sm">
                         <Link href="/products">
-                          <List />
+                          <List className="size-4" />
                           <span>Products List</span>
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton asChild size="sm">
                         <Link href="/products/add">
-                          <Plus />
+                          <Plus className="size-4" />
                           <span>Add Product</span>
                         </Link>
                       </SidebarMenuButton>
