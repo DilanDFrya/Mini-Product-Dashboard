@@ -15,17 +15,20 @@ import {
 } from "@/components/ui/hover-card";
 import { Edit, Trash2, Star } from "lucide-react";
 import type { Product } from "@/app/api/products/route";
+import { HighlightText } from "./highlight-text";
 
 interface ProductsTableProps {
   products: Product[];
   onEdit: (id: number) => void;
   onDelete: (id: number, name: string) => void;
+  searchQuery?: string;
 }
 
 export function ProductsTable({
   products,
   onEdit,
   onDelete,
+  searchQuery = "",
 }: ProductsTableProps) {
   return (
     <div className="rounded-lg border border-border bg-card shadow-sm">
@@ -55,7 +58,9 @@ export function ProductsTable({
                       unoptimized
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{product.title}</TableCell>
+                  <TableCell className="font-medium">
+                    <HighlightText text={product.title} searchQuery={searchQuery} />
+                  </TableCell>
                   <TableCell className="max-w-md truncate">
                     {product.description}
                   </TableCell>

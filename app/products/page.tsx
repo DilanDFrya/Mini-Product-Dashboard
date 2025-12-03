@@ -76,14 +76,20 @@ export default function ProductsPage() {
   const filteredProducts = useMemo(() => {
     let filtered = allProducts;
 
-    // Search filter
+    // Search filter - search by product name (title) only
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (product) =>
-          product.title.toLowerCase().includes(query) ||
-          product.description.toLowerCase().includes(query)
-      );
+      const query = searchQuery.trim().toLowerCase();
+      const queryWords = query.split(/\s+/).filter(Boolean);
+
+      filtered = filtered.filter((product) => {
+        const title = product.title.toLowerCase();
+
+        // Check if all query words appear in the product title
+        return queryWords.every((word) => {
+          // Simple substring match - fast and reliable
+          return title.includes(word);
+        });
+      });
     }
 
     // Category filter
@@ -230,6 +236,7 @@ export default function ProductsPage() {
             products={paginatedProducts}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            searchQuery={searchQuery}
           />
 
           <ProductsPagination
