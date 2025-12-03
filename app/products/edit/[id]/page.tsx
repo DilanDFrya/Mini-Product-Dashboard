@@ -1,19 +1,24 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter, useParams } from "next/navigation"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
-import { getProduct, updateProduct } from "@/lib/api/products"
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import {
+  getProduct,
+  updateProduct,
+  type Product,
+} from "@/app/api/products/route";
+import { saveUpdatedProduct, getUpdatedProducts } from "@/lib/storage/products";
 
 export default function EditProductPage() {
-  const router = useRouter()
-  const params = useParams()
-  const productId = parseInt(params.id as string)
+  const router = useRouter();
+  const params = useParams();
+  const productId = parseInt(params.id as string);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -21,80 +26,119 @@ export default function EditProductPage() {
     price: "",
     category: "",
     image: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isNaN(productId)) {
-      router.push("/products")
-      return
+      router.push("/products");
+      return;
     }
 
     const fetchProduct = async () => {
       try {
-        setIsLoading(true)
-        setError(null)
-        const product = await getProduct(productId)
+        setIsLoading(true);
+        setError(null);
+
+        // Check if product was updated locally first
+        const updatedProducts = getUpdatedProducts();
+        let product: Product | null = updatedProducts[productId] || null;
+
+        // If not in local updates, fetch from API
+        if (!product) {
+          product = await getProduct(productId);
+        }
+
         setFormData({
           name: product.title,
           description: product.description,
           price: product.price.toString(),
           category: product.category,
           image: product.image,
-        })
+        });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load product")
-        console.error("Error fetching product:", err)
+        setError(err instanceof Error ? err.message : "Failed to load product");
+        console.error("Error fetching product:", err);
         // Redirect to products list if product not found
         if (err instanceof Error && err.message === "Product not found") {
-          setTimeout(() => router.push("/products"), 2000)
+          setTimeout(() => router.push("/products"), 2000);
         }
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProduct()
-  }, [productId, router])
+    fetchProduct();
+  }, [productId, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
     try {
-      await updateProduct(productId, {
-        title: formData.name,
-        description: formData.description,
-        price: parseFloat(formData.price),
-        category: formData.category,
-        image: formData.image || "https://via.placeholder.com/300",
-      })
+      // Try to update via API (may fail for fake API, but that's ok)
+      let updatedProduct: Product;
+      try {
+        updatedProduct = await updateProduct(productId, {
+          title: formData.name,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          category: formData.category,
+          image: formData.image || "https://via.placeholder.com/300",
+        });
+      } catch (apiError) {
+        // If API update fails, create updated product from form data
+        // First, try to get the original product to preserve rating
+        let originalProduct: Product | null = null;
+        try {
+          originalProduct = await getProduct(productId);
+        } catch {
+          // If we can't get original, use default rating
+        }
+
+        updatedProduct = {
+          id: productId,
+          title: formData.name,
+          description: formData.description,
+          price: parseFloat(formData.price),
+          category: formData.category,
+          image: formData.image || "https://via.placeholder.com/300",
+          rating: originalProduct?.rating || { rate: 0, count: 0 },
+        };
+      }
+
+      // Save to local storage so it persists across page reloads
+      saveUpdatedProduct(updatedProduct);
+
       // Reset submitting state before redirect
-      setIsSubmitting(false)
+      setIsSubmitting(false);
       toast.success("Product updated successfully", {
         description: `${formData.name} has been updated.`,
-      })
+      });
       // Redirect to products list on success
-      router.push("/products")
+      router.push("/products");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update product"
-      setError(errorMessage)
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update product";
+      setError(errorMessage);
       toast.error("Failed to update product", {
         description: errorMessage,
-      })
-      setIsSubmitting(false)
+      });
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   if (isLoading) {
     return (
@@ -128,7 +172,7 @@ export default function EditProductPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error && error === "Product not found") {
@@ -149,7 +193,7 @@ export default function EditProductPage() {
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -170,7 +214,10 @@ export default function EditProductPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-sm"
+      >
         <div className="space-y-2">
           <label htmlFor="name" className="text-sm font-medium">
             Product Name
@@ -262,6 +309,5 @@ export default function EditProductPage() {
         </div>
       </form>
     </div>
-  )
+  );
 }
-

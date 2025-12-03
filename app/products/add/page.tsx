@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
-import { createProduct } from "@/lib/api/products"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { createProduct } from "@/app/api/products/route";
+import { saveCreatedProduct } from "@/lib/storage/products";
 
 export default function AddProductPage() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
     category: "",
     image: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
 
     try {
       const newProduct = await createProduct({
@@ -33,30 +34,37 @@ export default function AddProductPage() {
         price: parseFloat(formData.price),
         category: formData.category,
         image: formData.image || "https://via.placeholder.com/300",
-      })
+      });
+
+      // Save to local storage so it persists across page reloads
+      saveCreatedProduct(newProduct);
+
       // Reset submitting state before redirect
-      setIsSubmitting(false)
+      setIsSubmitting(false);
       toast.success("Product added successfully", {
         description: `${formData.name} has been added to your products.`,
-      })
+      });
       // Redirect to products list on success
-      router.push("/products")
+      router.push("/products");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create product"
-      setError(errorMessage)
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to create product";
+      setError(errorMessage);
       toast.error("Failed to add product", {
         description: errorMessage,
-      })
-      setIsSubmitting(false)
+      });
+      setIsSubmitting(false);
     }
-  }
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -76,7 +84,10 @@ export default function AddProductPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-w-2xl rounded-lg border border-border bg-card p-6 shadow-sm"
+      >
         <div className="space-y-2">
           <label htmlFor="name" className="text-sm font-medium">
             Product Name
@@ -168,6 +179,5 @@ export default function AddProductPage() {
         </div>
       </form>
     </div>
-  )
+  );
 }
-

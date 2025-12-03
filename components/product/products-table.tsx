@@ -14,7 +14,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Edit, Trash2, Star } from "lucide-react";
-import type { Product } from "@/lib/api/products";
+import type { Product } from "@/app/api/products/route";
 
 interface ProductsTableProps {
   products: Product[];
@@ -55,9 +55,7 @@ export function ProductsTable({
                       unoptimized
                     />
                   </TableCell>
-                  <TableCell className="font-medium">
-                    {product.title}
-                  </TableCell>
+                  <TableCell className="font-medium">{product.title}</TableCell>
                   <TableCell className="max-w-md truncate">
                     {product.description}
                   </TableCell>
@@ -91,11 +89,7 @@ export function ProductsTable({
                   </TableCell>
                 </TableRow>
               </HoverCardTrigger>
-              <HoverCardContent
-                className="w-80"
-                align="start"
-                side="bottom"
-              >
+              <HoverCardContent className="w-80" align="start" side="bottom">
                 <div className="space-y-3">
                   <div>
                     <h4 className="text-sm font-semibold mb-1">
@@ -109,10 +103,10 @@ export function ProductsTable({
                     <div className="flex items-center gap-1.5">
                       <Star className="size-4 fill-primary text-primary" />
                       <span className="text-sm font-medium">
-                        {product.rating.rate}
+                        {product.rating?.rate ?? 0}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        ({product.rating.count} reviews)
+                        ({product.rating?.count ?? 0} reviews)
                       </span>
                     </div>
                     <div className="text-sm">
@@ -130,4 +124,3 @@ export function ProductsTable({
     </div>
   );
 }
-

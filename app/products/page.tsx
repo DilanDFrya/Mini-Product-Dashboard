@@ -3,7 +3,17 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getProducts, deleteProduct, type Product } from "@/lib/api/products";
+import {
+  getProducts,
+  deleteProduct,
+  type Product,
+} from "@/app/api/products/route";
+import {
+  mergeProductsWithLocalChanges,
+  saveDeletedId,
+  removeCreatedProduct,
+  removeUpdatedProduct,
+} from "@/lib/storage/products";
 import { DeleteProductModal } from "@/components/delete-product-modal";
 import { ProductsPageHeader } from "@/components/product/products-page-header";
 import { ProductSearchBar } from "@/components/product/product-search-bar";
@@ -42,8 +52,10 @@ export default function ProductsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await getProducts();
-      setAllProducts(data);
+      const apiData = await getProducts();
+      // Merge with local changes (created/updated/deleted)
+      const mergedData = mergeProductsWithLocalChanges(apiData);
+      setAllProducts(mergedData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load products");
       console.error("Error fetching products:", err);
@@ -140,7 +152,20 @@ export default function ProductsPage() {
 
     try {
       setIsDeleting(true);
-      await deleteProduct(productToDelete.id);
+
+      // Try to delete from API (may fail for fake API, but that's ok)
+      try {
+        await deleteProduct(productToDelete.id);
+      } catch (apiError) {
+        // API delete may fail, but we'll still save locally
+        console.warn("API delete failed, saving locally:", apiError);
+      }
+
+      // Save deletion locally
+      saveDeletedId(productToDelete.id);
+      removeCreatedProduct(productToDelete.id);
+      removeUpdatedProduct(productToDelete.id);
+
       // Refresh the product list after deletion
       await fetchProducts();
       setIsDeleteModalOpen(false);
