@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
@@ -26,7 +27,7 @@ export default function AddProductPage() {
     setError(null)
 
     try {
-      await createProduct({
+      const newProduct = await createProduct({
         title: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
@@ -35,10 +36,17 @@ export default function AddProductPage() {
       })
       // Reset submitting state before redirect
       setIsSubmitting(false)
+      toast.success("Product added successfully", {
+        description: `${formData.name} has been added to your products.`,
+      })
       // Redirect to products list on success
       router.push("/products")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create product")
+      const errorMessage = err instanceof Error ? err.message : "Failed to create product"
+      setError(errorMessage)
+      toast.error("Failed to add product", {
+        description: errorMessage,
+      })
       setIsSubmitting(false)
     }
   }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { getProducts, deleteProduct, type Product } from "@/lib/api/products";
 import { DeleteProductModal } from "@/components/delete-product-modal";
 import { ProductsPageHeader } from "@/components/product/products-page-header";
@@ -144,8 +145,15 @@ export default function ProductsPage() {
       await fetchProducts();
       setIsDeleteModalOpen(false);
       setProductToDelete(null);
+      toast.success("Product deleted successfully", {
+        description: `${productToDelete.name} has been removed.`,
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete product");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete product";
+      toast.error("Failed to delete product", {
+        description: errorMessage,
+      });
       console.error("Error deleting product:", err);
     } finally {
       setIsDeleting(false);

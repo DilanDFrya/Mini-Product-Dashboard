@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -73,10 +74,17 @@ export default function EditProductPage() {
       })
       // Reset submitting state before redirect
       setIsSubmitting(false)
+      toast.success("Product updated successfully", {
+        description: `${formData.name} has been updated.`,
+      })
       // Redirect to products list on success
       router.push("/products")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update product")
+      const errorMessage = err instanceof Error ? err.message : "Failed to update product"
+      setError(errorMessage)
+      toast.error("Failed to update product", {
+        description: errorMessage,
+      })
       setIsSubmitting(false)
     }
   }

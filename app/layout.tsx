@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Package } from "lucide-react";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,6 +63,7 @@ export default function RootLayout({
             <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
           </SidebarInset>
         </SidebarProvider>
+        <Toaster />
       </body>
     </html>
   );
