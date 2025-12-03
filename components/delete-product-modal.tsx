@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -7,16 +7,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 interface DeleteProductModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  productName?: string
-  isDeleting?: boolean
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+  productName?: string;
+  isDeleting?: boolean;
 }
 
 export function DeleteProductModal({
@@ -35,7 +35,9 @@ export function DeleteProductModal({
               <AlertTriangle className="size-5 text-destructive" />
             </div>
             <div className="space-y-1.5">
-              <DialogTitle className="text-lg sm:text-xl">Delete Product</DialogTitle>
+              <DialogTitle className="text-lg sm:text-xl">
+                Delete Product
+              </DialogTitle>
               <DialogDescription className="text-sm">
                 Are you sure you want to delete this product? This action cannot
                 be undone.
@@ -68,6 +70,5 @@ export function DeleteProductModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
