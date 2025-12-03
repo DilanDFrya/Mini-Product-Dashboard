@@ -4,6 +4,7 @@ import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { PanelLeftIcon } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
@@ -165,10 +166,25 @@ function Sidebar({
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
   const [isMounted, setIsMounted] = React.useState(false)
+  const pathname = usePathname()
+  const prevPathnameRef = React.useRef(pathname)
 
   React.useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  // Close mobile sidebar when pathname changes
+  React.useEffect(() => {
+    // Check if pathname actually changed and component is mounted
+    if (isMounted && pathname !== prevPathnameRef.current) {
+      // Close sidebar if we're on mobile
+      if (isMobile) {
+        setOpenMobile(false)
+      }
+      // Update the ref to track the current pathname
+      prevPathnameRef.current = pathname
+    }
+  }, [pathname, isMounted, isMobile, setOpenMobile])
 
   if (collapsible === "none") {
     return (
@@ -188,8 +204,16 @@ function Sidebar({
   // During SSR and before hydration, always render desktop version to prevent mismatch
   // After hydration, use the actual isMobile value
   if (isMounted && isMobile) {
+    console.log("Rendering mobile Sheet, openMobile:", openMobile);
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet 
+        open={openMobile} 
+        onOpenChange={(open) => {
+          console.log("Sheet onOpenChange called with:", open);
+          setOpenMobile(open);
+        }}
+        {...props}
+      >
         <SheetContent
           data-sidebar="sidebar"
           data-slot="sidebar"
