@@ -46,7 +46,9 @@ The app integrates with the **Fake Store API** (`https://fakestoreapi.com/produc
 
 ### What the API Does
 
-The API module (`app/api/products/route.ts`) provides functions to interact with the Fake Store API:
+The API module (`app/api/products/route.ts`) provides functions to interact with the Fake Store API.
+
+**Note**: This file is structured as a Next.js route handler (`route.ts`) to satisfy Next.js build requirements. The file exports utility functions (`getProducts`, `createProduct`, etc.) that are used throughout the app, along with stub route handlers (GET, POST, PUT, DELETE) that return 501 (Not Implemented). The stub handlers are required by Next.js but are not used - the actual functionality comes from the utility functions.
 
 #### 1. **`getProducts()`** - Fetch All Products
 
@@ -177,7 +179,7 @@ mini-product-dashboard/
 ├── app/
 │   ├── api/
 │   │   └── products/
-│   │       └── route.ts          # API functions (getProducts, createProduct, etc.)
+│   │       └── route.ts          # API utility functions + Next.js route handlers
 │   ├── products/
 │   │   ├── page.tsx              # Products list page
 │   │   ├── add/

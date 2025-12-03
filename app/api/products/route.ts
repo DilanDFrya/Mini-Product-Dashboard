@@ -197,3 +197,22 @@ export async function deleteProduct(id: number): Promise<Product> {
     throw error;
   }
 }
+
+// Export empty route handlers to satisfy Next.js route handler requirements
+// These are not used, but required for the file to be recognized as a valid route file
+export async function GET() {
+  return new Response("Not implemented", { status: 501 });
+}
+
+export async function POST() {
+  return new Response("Not implemented", { status: 501 });
+}
+
+export async function PUT() {
+  return new Response("Not implemented", { status: 501 });
+}
+
+export async function DELETE() {
+  return new Response("Not implemented", { status: 501 });
+}
+
